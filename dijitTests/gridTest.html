@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Test dojox.grid.DataGrid Large Data Set</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+    <style type="text/css">
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/resources/dojo.css";
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dijit/themes/claro/claro.css";
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojox/grid/resources/Grid.css";
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojox/grid/resources/claroGrid.css";
+
+        body {
+            font-size: 0.9em;
+            font-family: Geneva, Arial, Helvetica, sans-serif;
+        }
+        .heading {
+            font-weight: bold;
+            padding-bottom: 0.25em;
+        }
+        #grid1, #grid2, #grid3 {
+            width: 65em;
+            height: 15em;
+            padding: 1px;
+        }
+        .big     { font-variant: small-caps; }
+        .small   { font-weight: bold; }
+        .red     { background-color: red; color: white; }
+        .blue    { color: blue; }
+        .italics { font-style: italic; }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js"
+        data-dojo-config="isDebug:false, parseOnLoad: false"></script>
+
+
+    <script type="text/javascript">
+        dojo.require("dijit.dijit");
+        dojo.require("dijit.ProgressBar");
+        dojo.require("dojox.grid.DataGrid");
+        dojo.require("dojo.data.ItemFileReadStore");
+        dojo.require("dojox.data.QueryReadStore");
+        dojo.require("dojo.parser");
+    </script>
+    <script type="text/javascript">
+        function formatGender(value){
+            switch(value) {
+                case 'm':
+                    return "<img alt='male' src='male.jpg'/>";
+                case 'f':
+                    return "<img alt='female' src='female.jpg'/>";
+            }
+        }
+
+        function formatName(value) {
+            var className = null;
+            switch (value.charCodeAt(0) % 6) {
+                case 0:
+                    className = "red";
+                    break;
+                case 1:
+                    className = "small";
+                    break;
+                case 2:
+                    className = "blue";
+                    break;
+                case 3:
+                    className = "big";
+                    break;
+                case 4:
+                default:
+                    className = "blue italics";
+                    break;
+            }
+            return "<span class='"+className+"'>"+value+"</span>";
+        }
+
+        function formatSurname(value) {
+            var className = null;
+            if (value.charCodeAt(0) <= 75) {
+                className = "red";
+            } else if (value.charCodeAt(0) <= 90) {
+                className = "big";
+            } else {
+                className = "italics";
+            }
+            return "<span class='"+className+"'>"+value+"</span>";
+        }
+
+        function formatProgress(val) {
+            return new dijit.ProgressBar({
+                style:"width:80%; margin: 0 auto;",
+                indeterminate:false,
+                maximum: 100,
+                value: val
+            }, "pi");
+        }
+
+        function formatURL(value) {
+            if (value) {
+                var double_meh_pos = value.indexOf('://');
+                var sitename = value;
+                if (double_meh_pos > -1) {
+                    sitename = value.substring(double_meh_pos + 3);
+                }
+                return "<a href='"+value+"'>" + sitename + "</a>";
+            } else {
+                return "--";
+            }
+        }
+
+        function appendStructRows(rowArray, count, offset) {
+            for (var i = 0; i < count; i++) {
+                var index = i+offset;
+                rowArray.push({name:   'Date '+index, field:   'date'+index});
+                rowArray.push({name:    'Int '+index, field:    'int'+index});
+                rowArray.push({name:  'Float '+index, field:  'float'+index});
+                rowArray.push({name: 'String '+index, field: 'string'+index});
+            }
+        }
+
+        // a grid layout is an array of views.
+        var left_view = {
+            noscroll: true,
+            rows: [[
+                {name: 'ID', field: 'id', noscroll: 'true'}
+            ]]
+        },
+        right_view = {
+            rows: [[
+                {name: 'First Name', field: 'first_name'},
+                {name: 'Surname', field: 'surname'},
+                {name: 'Gender', field: 'gender'},
+                {name: 'Garbage String', field: 'randomString', width: '250px'},
+                {name: 'URL', field: 'link'},
+                {name: 'Date 1', field: 'startDate'},
+                {name: 'Int 1', field: 'randomInt'},
+                {name: 'Float 1', field: 'randomFloat'}
+            ]]
+        };
+        appendStructRows(right_view['rows'][0], 49, 2);
+        small_right_view = {
+            rows: [[
+                {name: 'First Name', field: 'first_name'},
+                {name: 'Surname', field: 'surname'},
+                {name: 'Gender', field: 'gender'},
+                {name: 'Start Date', field: 'startDate'},
+                {name: 'URL', field: 'link', width: "auto"}
+            ]]
+        },
+        big_layout = [left_view, right_view],
+        small_layout = [left_view, small_right_view];
+        custom_layout = [left_view, {
+            rows: [[
+                {name: 'First Name', field: 'first_name', formatter: formatName},
+                {name: 'Surname', field: 'surname', formatter: formatSurname},
+                {name: 'Gender', field: 'gender', formatter: formatGender},
+                {name: 'Completion', field: 'randomFloat', formatter: formatProgress},
+                {name: 'URL', field: 'link', width: "auto", formatter: formatURL}
+            ]]
+        }];
+        var store, grid1, grid2, grid3;
+        dojo.ready(function(){
+            istore = new dojo.data.ItemFileReadStore({
+                url: "data-1k.json"
+            });
+            qstore = new dojox.data.QueryReadStore({
+                url: "gridata.json"
+            });
+            grid1 = new dojox.grid.DataGrid({
+                store: istore,
+                query: { id: "*" },
+                queryOptions: {},
+                rowsPerPage: 100,
+                structure: big_layout,
+                canSort: false
+            }, "grid1");
+
+            grid2 = new dojox.grid.DataGrid({
+                store: qstore,
+                query: { id: "*" },
+                queryOptions: {},
+                rowsPerPage: 25,
+                structure: small_layout,
+                canSort: false
+            }, "grid2");
+
+            dojo.connect(grid2, "onCellClick", function(e) {
+                         console.info("onCellClick...." + e);
+                         console.dir(e);
+                         console.info(grid2.getItem(e.rowIndex));
+                         });
+
+            grid3 = new dojox.grid.DataGrid({
+                store: qstore,
+                query: { id: "*" },
+                queryOptions: {},
+                rowsPerPage: 25,
+                structure: custom_layout,
+                canSort: false
+            }, "grid3");
+
+            dojo.connect(grid1, "_onFetchBegin", grid1Paging);
+            dojo.connect(grid2, "_onFetchBegin", grid2Paging);
+            dojo.connect(grid3, "_onFetchBegin", grid3Paging);
+            dojo.connect(grid1, "_onFetchComplete", grid1Done);
+            dojo.connect(grid2, "_onFetchComplete", grid2Done);
+            dojo.connect(grid3, "_onFetchComplete", grid3Done);
+        });
+
+        var grid1start, grid2start = null,
+            grid1page, grid2page = null;
+        function StartGrid1() {
+            grid1start = new Date();
+            grid1.startup();
+        }
+        function grid1Paging() {
+            grid1page = new Date();
+        }
+        function grid1Done() {
+            if (grid1start) {
+                timediff = (new Date() - grid1start)/1000;
+                dojo.byId('grid1_timing').innerHTML += " Setup took " + timediff + "s. (now try scrolling) ";
+                grid1start = null;
+            } else if (grid1page) {
+                timediff = (new Date() - grid1page)/1000;
+                dojo.byId('grid1_timing').innerHTML += " Paging took " + timediff + "s. ";
+                grid1page = null;
+            }
+        }
+
+        function StartGrid2() {
+            grid2start = new Date();
+            grid2.startup();
+        }
+        function grid2Paging() {
+            grid2page = new Date();
+        }
+        function grid2Done() {
+            if (grid2start) {
+                timediff = (new Date() - grid2start)/1000;
+                dojo.byId('grid2_timing').innerHTML += " Setup took " + timediff + "s. (now try scrolling) ";
+                grid2start = null;
+            } else if (grid2page) {
+                timediff = (new Date() - grid2page)/1000;
+                dojo.byId('grid2_timing').innerHTML += " Paging took " + timediff + "s. ";
+                grid2page = null;
+            }
+        }
+
+        function StartGrid3() {
+            grid3start = new Date();
+            grid3.startup();
+        }
+        function grid3Paging() {
+            grid3page = new Date();
+        }
+        function grid3Done() {
+            if (grid3start) {
+                timediff = (new Date() - grid3start)/1000;
+                dojo.byId('grid3_timing').innerHTML += " Setup took " + timediff + "s. ";
+                grid3start = null;
+            } else if (grid3page) {
+                timediff = (new Date() - grid3page)/1000;
+                dojo.byId('grid3_timing').innerHTML += " Paging took " + timediff + "s. ";
+                grid3page = null;
+            }
+        }
+
+    </script>
+</head>
+<body class="claro">
+    <h1>DataGrid Bootcamp Large Data Set Test</h1>
+
+    <h2>Slow Grid (bad page size, bad structure)</h2>
+    <button onclick="StartGrid1();">Start</button><span id="grid1_timing"> </span>
+    <div id="grid1"></div>
+
+    <h2>Optimized Grid (smaller size, fewer columns)</h2>
+    <button onclick="StartGrid2();">Start</button><span id="grid2_timing"> </span>
+    <div id="grid2"></div>
+
+    <hr/>
+    <h2>Extra credit: Custom Grid (smaller, but with several custom formatters)</h2>
+    <button onclick="StartGrid3();">Start</button><span id="grid3_timing"> </span>
+    <div id="grid3"></div>
+</body>
+</html>
