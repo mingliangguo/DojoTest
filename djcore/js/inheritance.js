@@ -1,3 +1,15 @@
+/**
+* Simple test for dojo's inheritance system.
+* Dojo supports both single inheritance and multi-inheritance. Single inheritance is straightforward and similar to other mainstream languages.
+* While for multi-inheritance, it's a bit tricky. Unlike Java, javascript is a prototype based language and its inheritance system is based on 
+* the prototype. And javascript has its own method to detect instanceof and it doesn't work well for multi-inheritance.
+* 
+* Basically, for multi-inheritance, Dojo only makes the first class in the prototype chain, which will work for instanceof. While for other classes,
+* they will not work with instancof check. To deal with that, Dojo provide its only mechanism, isInstanceOf which can be used to check if an object 
+* is an instance of a given class.
+* 
+* For more details, please refer to http://dojotoolkit.org/reference-guide/1.8/dojo/_base/declare.html
+*/ 
 require(["dojo/_base/declare"], function(declare){
     var garyAClazz = declare("garyA", null, {
         constructor: function(){
