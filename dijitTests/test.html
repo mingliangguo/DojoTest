@@ -3,24 +3,24 @@
 
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-        <link rel="stylesheet" type="text/css" href="js/lib/dijit/themes/claro/claro.css"></link>
-        <link rel="stylesheet" type="text/css" href="js/lib/dojo/resources/dojo.css"></link>
-        <link rel="stylesheet" type="text/css" href="js/lib/dojo/resources/dnd.css"></link>
+        <link rel="stylesheet" type="text/css" href="../lib/dijit/themes/claro/claro.css"></link>
+        <link rel="stylesheet" type="text/css" href="../lib/dojo/resources/dojo.css"></link>
+        <link rel="stylesheet" type="text/css" href="../lib/dojo/resources/dnd.css"></link>
         <title>My Dijit Test Page</title>
         <script>
             // define the dojo package alias
             var dojoConfig = {
-                baseUrl: "./js/",
+                baseUrl: "../",
                 tlmSiblingOfDojo: false,
                 packages: [
                 {name: "dojo", location: "lib/dojo"},
                 {name: "dijit", location: "lib/dijit" },
                 {name: "dojox", location: "lib/dojox" },
-                {name: "my", location: "my"}
+                {name: "my", location: "dijitTests/js/my"}
                 ]
             };
         </script>
-        <script data-dojo-config="async: true" src="js/lib/dojo/dojo.js"></script>
+        <script data-dojo-config="async: true" src="../lib/dojo/dojo.js"></script>
         <!--
         <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js"></script>
         -->
