@@ -11,3 +11,5 @@ The test code are categorized into several folders:
 
 # dijitTest
 - 	simple dijit test cases 
+    -   It has one sampel for dojo grid (for dojo 1.6)
+    -   Another simple test for a menu
