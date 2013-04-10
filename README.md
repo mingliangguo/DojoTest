@@ -13,3 +13,4 @@ The test code are categorized into several folders:
 - 	simple dijit test cases 
     -   It has one sample for dojo grid (for dojo 1.6)
     -   Another simple test for a menu
+    -   Add a new test to test dojo dijit's inheritance behavior. 
