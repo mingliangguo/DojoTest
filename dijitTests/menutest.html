@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<link rel="stylesheet" type="text/css" href="../lib/dijit/themes/claro/claro.css"></link>
+<link rel="stylesheet" type="text/css" href="../lib/dojo/resources/dojo.css"></link>
+<link rel="stylesheet" type="text/css" href="../lib/dojo/resources/dnd.css"></link>
+<title>My Menu Test Page</title>
+<script>
+// define the dojo package alias
+var dojoConfig = {
+				baseUrl: "../",
+         tlmSiblingOfDojo: false,
+				 isDebug: true,
+				 async: true,
+         packages: [
+         {name: "dojo", location: "lib/dojo"},
+         {name: "dijit", location: "lib/dijit" },
+         {name: "dojox", location: "lib/dojox" },
+         {name: "my", location: "dijitTests/js/my"}
+         ]
+};
+</script>
+<script src="../lib/dojo/dojo.js"></script>
+<!--
+        <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js"></script>
+        -->
+<script>
+require(["dojo/ready", "dijit/registry", "dojo/query", "dojox/NodeList/delegate", "dojo/_base/connect", "dojo/parser", "dojo/dom", "dijit/layout/ContentPane", "dijit/Menu", "dijit/MenuItem", "dijit/PopupMenuItem", "dijit/MenuSeparator", "dijit/ColorPalette"], function(ready, registry, query, delegate, connect, parser, dom, ContentPane, Menu, MenuItem){
+        ready(function(){
+							var lastClicked = null;
+							query("#testmenu").delegate('li', 'onclick', function(evt)
+								 {
+										 lastClicked = evt.target;
+								 });
+
+
+
+							// a menu item selection handler
+								var onItemSelect = function(evt){
+									// retrieve the widget representing the item clicked
+							  var item = registry.getEnclosingWidget(evt.target);
+								dom.byId("lastSelected").innerHTML = item.get("label") + lastClicked.innerHTML;
+								};
+
+								// create the Menu container
+								var menu = new Menu({
+										id: "testmenu",
+										contextMenuForWindow: true,
+										targetNodeId: ["testmenu"],
+										selector: ".menuitem"
+								});
+
+								// create and add child item widgets
+								// for each of "edit", "view", "task"
+
+								menu.addChild( new MenuItem({
+									id: "edit",
+									label: "Edit",
+									// provide an implementation for the onClick method
+									onClick: onItemSelect
+								}) );
+
+								menu.addChild( new MenuItem({
+									id: "view",
+									label: "View",
+									onClick: onItemSelect
+								}) );
+
+								menu.addChild( new MenuItem({
+									id: "task",
+									label: "Task",
+									onClick: onItemSelect
+								}) );
+
+								menu.startup();
+              });
+
+        });
+</script>
+</head>
+
+<body class="claro" style="width: 100%; height: 100%; position: absolute;">
+<div style="width:100%; height:100%; padding:2em">
+		<p>Menu test</p>
+    <div id="testmenu">
+				<ul>
+					<li class="menuitem">aaa1</li>
+					<li class="menuitem">aaa2</li>
+					<li class="menuitem">aaa3</li>
+					<li class="menuitem">aaa4</li>
+					<li class="menuitem">aaa5</li>
+				</ul>
+		</div>
+		<p>Last selected: <span id="lastSelected">none</span></p>
+    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-attach-point="wrapTopToolbar" data-dojo-props="region:'bottom', style: 'border:none;'"></div>
+</div>
+</body>
+
+</html>

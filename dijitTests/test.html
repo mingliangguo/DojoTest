@@ -46,7 +46,9 @@
                         disabled: true
                     }));
 
-                    parser.parse();
+                    myMenu.startup();
+
+                    // parser.parse();
                 });
             });
         </script>
@@ -61,6 +63,7 @@
             <li class="aaa"> sssss</li>
         </ul>
         <div data-dojo-type="dijit/Menu" id="windowContextMenu" data-dojo-props="contextMenuForWindow:true" style="display: none;">
+            <!--
             <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'dijitEditorIcon dijitEditorIconCut',
                 onClick:function(){alert('not actually cutting anything, just a test!')}">Cut</div>
             <div data-dojo-type="dijit/MenuItem" data-dojo-props="iconClass:'dijitEditorIcon dijitEditorIconCopy',
@@ -79,6 +82,7 @@
                 <span>Popup of something other than a menu</span>
                 <div data-dojo-type="dijit/ColorPalette"></div>
             </div>
+            -->
         </div>
 
         <span>Right click anywhere on this page to see a menu</span>
